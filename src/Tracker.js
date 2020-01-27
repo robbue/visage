@@ -13,7 +13,7 @@ class Tracker extends React.Component {
 			width: 320,
 			height: 240,
 			licenseName: '251-700-611-878-240-511-438-067-770-738-460.vlc',
-			licenseURL: 'visage/lib/251-700-611-878-240-511-438-067-770-738-460.vlc'
+			licenseURL: 'lib/251-700-611-878-240-511-438-067-770-738-460.vlc'
 		};
 
 		this.$canvas = React.createRef();
@@ -28,7 +28,7 @@ class Tracker extends React.Component {
 
 	componentDidMount () {
 		var locateFile = function (dataFileName) {
-			var relativePath = 'visage/lib/' + dataFileName;
+			var relativePath = 'lib/' + dataFileName;
 			return relativePath;
 		};
 
@@ -38,7 +38,7 @@ class Tracker extends React.Component {
 		});
 
 		var preloadFiles = () => {
-			this.visageModule.FS_createPreloadedFile('/', 'Facial Features Tracker - High.cfg', 'visage/lib/Facial Features Tracker - High.cfg', true, false);
+			this.visageModule.FS_createPreloadedFile('/', 'Facial Features Tracker - High.cfg', 'lib/Facial Features Tracker - High.cfg', true, false);
 			this.visageModule.FS_createPreloadedFile('/', this.state.licenseName, this.state.licenseURL, true, false, function () {}, function () { console.error('Loading License Failed!'); });
 		};
 
