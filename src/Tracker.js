@@ -12,8 +12,8 @@ class Tracker extends React.Component {
 			sdkLoaded: false,
 			width: 320,
 			height: 240,
-			licenseName: '251-700-611-878-240-511-438-067-770-738-460.vlc?v=1',
-			licenseURL: 'lib/251-700-611-878-240-511-438-067-770-738-460.vlc?v=1'
+			licenseName: '251-700-611-878-240-511-438-067-770-738-460.vlc?v=2',
+			licenseURL: 'lib/251-700-611-878-240-511-438-067-770-738-460.vlc?v=2'
 		};
 
 		this.$canvas = React.createRef();
