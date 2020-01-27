@@ -1,26 +1,29 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled, { createGlobalStyle } from 'styled-components';
+// import logo from './logo.svg';
+import { AppContainer } from './styles'; // , AppHeader, AppTitle, AppLogo, AppIntro
+import Tracker from './Tracker';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+// Add global styles
+const GlobalStyle = createGlobalStyle`
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: sans-serif;
+	}
+`;
+
+export const Button = styled.button``;
+
+function App () {
+	return (
+		<React.Fragment>
+			<GlobalStyle />
+			<AppContainer>
+				<Tracker />
+			</AppContainer>
+		</React.Fragment>
+	);
 }
 
 export default App;
