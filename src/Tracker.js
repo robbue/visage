@@ -1,9 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
 
+const Container = styled.div`
+	text-align: center;
+`;
 const Button = styled.button``;
 const Canvas = styled.canvas``;
-const Status = styled.div``;
+const Status = styled.p``;
 
 class Tracker extends React.Component {
 	constructor (props) {
@@ -41,7 +44,11 @@ class Tracker extends React.Component {
 		});
 
 		var preloadFiles = () => {
+			// the most powerful devices such as newer computers, or mobile devices such as iPhone X/Samsung Galaxy S9.
+			this.visageModule.FS_createPreloadedFile('/', 'FFT-Ultra.cfg', 'lib/Facial Features Tracker - Ultra.cfg', true, false);
+			// most computers and mobile devices such as iPhone 6/Samsung Galaxy S5 or better
 			this.visageModule.FS_createPreloadedFile('/', 'FFT-High.cfg', 'lib/Facial Features Tracker - High.cfg', true, false);
+			// low performance mobile devices such as iPhone4S. Tracks head pose, mouth, eyebrows and eye motion.
 			this.visageModule.FS_createPreloadedFile('/', 'FFT-Low.cfg', 'lib/Facial Features Tracker - Low.cfg', true, false);
 			this.visageModule.FS_createPreloadedFile('/', this.state.licenseName, this.state.licenseURL, true, false, function () {}, function () { console.error('Loading License Failed!'); });
 		};
@@ -53,7 +60,7 @@ class Tracker extends React.Component {
 		// license
 		this.visageModule.initializeLicenseManager(this.state.licenseName);
 
-		this.m_Tracker = new this.visageModule.VisageTracker('FFT-Low.cfg');
+		this.m_Tracker = new this.visageModule.VisageTracker('FFT-Ultra.cfg');
 
 		// Instantiate the face data object
 		this.faceDataArray = new this.visageModule.FaceDataVector();
@@ -90,10 +97,7 @@ class Tracker extends React.Component {
 			});
 
 			this.$video.addEventListener('canplay', this._canPlayStream);
-			// this.$video.loop = this.$video.muted = this.$video.autoplay = this.$video.playsinline = true;
-			this.$video.setAttribute('loop', false);
 			this.$video.setAttribute('muted', true);
-			this.$video.setAttribute('autoplay', false);
 			this.$video.setAttribute('playsinline', true);
 			this.$video.srcObject = stream;
 			this.$video.load();
@@ -191,11 +195,13 @@ class Tracker extends React.Component {
 
 	render () {
 		return (
-			<React.Fragment>
-				Status: <Status ref={this.$status} />
-				{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
+			<Container>
+				<Status ref={this.$status} />
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
-			</React.Fragment>
+				<Container>
+					{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
+				</Container>
+			</Container>
 		);
 	}
 }
