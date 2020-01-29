@@ -90,8 +90,11 @@ class Tracker extends React.Component {
 			});
 
 			this.$video.addEventListener('canplay', this._canPlayStream);
-			this.$video.loop = this.$video.muted = this.$video.autoplay = this.$video.playsinline = true;
-			// this.$video.setAttribute('playsinline', true);
+			// this.$video.loop = this.$video.muted = this.$video.autoplay = this.$video.playsinline = true;
+			this.$video.setAttribute('loop', false);
+			this.$video.setAttribute('muted', true);
+			this.$video.setAttribute('autoplay', false);
+			this.$video.setAttribute('playsinline', true);
 			this.$video.srcObject = stream;
 			this.$video.load();
 		} catch (error) {
@@ -127,6 +130,13 @@ class Tracker extends React.Component {
 		// Draw to canvas
 		this.canvasContext.drawImage(this.$video, 0, 0, this.mWidth, this.mHeight);
 
+		// Access pixel data
+		this.imageData = this.canvasContext.getImageData(0, 0, this.mWidth, this.mHeight).data;
+
+		// Save pixel data to preallocated buffer
+		for (let i = 0; i < this.imageData.length; i += 4) {
+			this.pixels[i] = this.imageData[i];
+		}
 
 		// console.log({
 		// 	readyStatus: this.visageModule.VisageTrackerStatus.TRACK_STAT_OK.value,
@@ -139,6 +149,38 @@ class Tracker extends React.Component {
 		// 	VISAGE_FRAMEGRABBER_ORIGIN_TL: this.visageModule.VisageTrackerOrigin.VISAGE_FRAMEGRABBER_ORIGIN_TL.value
 		// });
 
+		this.trackerReturnState = this.m_Tracker.track(
+			this.mWidth,
+			this.mHeight,
+			this.ppixels,
+			this.faceDataArray,
+			this.visageModule.VisageTrackerImageFormat.VISAGE_FRAMEGRABBER_FMT_RGBA.value,
+      this.visageModule.VisageTrackerOrigin.VISAGE_FRAMEGRABBER_ORIGIN_TL.value
+		);
+
+		// console.log(this.trackerReturnState && this.trackerReturnState[0]);
+		// console.log(this.faceData.getEyeClosure());
+
+		if (this.trackerReturnState[0] === this.visageModule.VisageTrackerStatus.TRACK_STAT_OK.value) {
+			const closedEyes = this.faceData.getEyeClosure();
+			// Index 0 represents closure of left eye. Index 1 represents closure of right eye. Value of 1 represents open eye. Value of 0 represents closed eye.
+
+			if (closedEyes[0] === 0 && closedEyes[1] === 0) {
+				this.eyesClosedCounter++;
+
+				if (this.eyesClosedCounter > this.state.threshold) {
+					this.eyesClosed = true;
+				}
+			} else {
+				this.eyesClosed = false;
+			}
+
+			// console.log({
+			// 	eyesClosed: this.eyesClosed
+			// });
+		}
+
+		this.$status.current.innerHTML = this.eyesClosed.toString();
 
 		/*
 		NEXT:
@@ -150,7 +192,7 @@ class Tracker extends React.Component {
 	render () {
 		return (
 			<React.Fragment>
-				<Status ref={this.$status} />
+				Status: <Status ref={this.$status} />
 				{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
 			</React.Fragment>
