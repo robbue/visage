@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const Button = styled.button``;
 const Canvas = styled.canvas``;
+const Status = styled.div``;
 
 class Tracker extends React.Component {
 	constructor (props) {
@@ -18,6 +19,7 @@ class Tracker extends React.Component {
 		};
 
 		this.$canvas = React.createRef();
+		this.$status = React.createRef();
 
 		this._loaded = this._loaded.bind(this);
 		this._initStream = this._initStream.bind(this);
@@ -87,7 +89,8 @@ class Tracker extends React.Component {
 			});
 
 			this.$video.addEventListener('canplay', this._canPlayStream);
-			this.$video.loop = this.$video.muted = this.$video.autoplay = true;
+			this.$video.loop = this.$video.muted = this.$video.autoplay = this.$video.playsinline = true;
+			// this.$video.setAttribute('playsinline', true);
 			this.$video.srcObject = stream;
 			this.$video.load();
 		} catch (error) {
@@ -120,13 +123,11 @@ class Tracker extends React.Component {
 	_tick () {
 		window.requestAnimationFrame(this._tick);
 
+		// Draw to canvas
 		this.canvasContext.drawImage(this.$video, 0, 0, this.mWidth, this.mHeight);
 
 		// Access pixel data
 		this.imageData = this.canvasContext.getImageData(0, 0, this.mWidth, this.mHeight).data;
-
-		// Clear canvas
-		// this.canvasContext.clearRect(0, 0, this.$canvas.current.width, this.$canvas.current.height);
 
 		// Save pixel data to preallocated buffer
 		for (let i = 0; i < this.imageData.length; i += 4) {
@@ -151,9 +152,6 @@ class Tracker extends React.Component {
 			this.faceDataArray,
 			this.visageModule.VisageTrackerImageFormat.VISAGE_FRAMEGRABBER_FMT_RGBA.value,
       this.visageModule.VisageTrackerOrigin.VISAGE_FRAMEGRABBER_ORIGIN_TL.value
-			// 0,
-			// -1,
-			// 1
 		);
 
 		// console.log(this.trackerReturnState && this.trackerReturnState[0]);
@@ -173,10 +171,12 @@ class Tracker extends React.Component {
 				this.eyesClosed = false;
 			}
 
-			console.log({
-				eyesClosed: this.eyesClosed
-			});
+			// console.log({
+			// 	eyesClosed: this.eyesClosed
+			// });
 		}
+
+		this.$status.current.innerHTML = this.eyesClosed.toString();
 
 		/*
 		NEXT:
@@ -188,6 +188,7 @@ class Tracker extends React.Component {
 	render () {
 		return (
 			<React.Fragment>
+				<Status ref={this.$status} />
 				{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
 			</React.Fragment>
