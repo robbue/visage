@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.js": "/visage/static/js/main.b175f065.chunk.js",
-    "main.js.map": "/visage/static/js/main.b175f065.chunk.js.map",
+    "main.js": "/visage/static/js/main.da1eefe0.chunk.js",
+    "main.js.map": "/visage/static/js/main.da1eefe0.chunk.js.map",
     "runtime-main.js": "/visage/static/js/runtime-main.3e6282ca.js",
     "runtime-main.js.map": "/visage/static/js/runtime-main.3e6282ca.js.map",
     "static/js/2.55430c7a.chunk.js": "/visage/static/js/2.55430c7a.chunk.js",
     "static/js/2.55430c7a.chunk.js.map": "/visage/static/js/2.55430c7a.chunk.js.map",
     "index.html": "/visage/index.html",
-    "precache-manifest.f971b1b3b71ce0cebe22002b21162ca6.js": "/visage/precache-manifest.f971b1b3b71ce0cebe22002b21162ca6.js",
+    "precache-manifest.1117df1921c4ab7f2142293744ced8f6.js": "/visage/precache-manifest.1117df1921c4ab7f2142293744ced8f6.js",
     "service-worker.js": "/visage/service-worker.js",
     "static/js/2.55430c7a.chunk.js.LICENSE": "/visage/static/js/2.55430c7a.chunk.js.LICENSE"
   },
   "entrypoints": [
     "static/js/runtime-main.3e6282ca.js",
     "static/js/2.55430c7a.chunk.js",
-    "static/js/main.b175f065.chunk.js"
+    "static/js/main.da1eefe0.chunk.js"
   ]
 }

@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "ec100c64d6f071f8bda4e44e7b4a9d5c",
+    "revision": "242edf5f48960a59d4f286501cd57ee6",
     "url": "/visage/index.html"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/visage/static/js/2.55430c7a.chunk.js.LICENSE"
   },
   {
-    "revision": "c883d8380e76e1afb47a",
-    "url": "/visage/static/js/main.b175f065.chunk.js"
+    "revision": "09c67c2a97f045e926b6",
+    "url": "/visage/static/js/main.da1eefe0.chunk.js"
   },
   {
     "revision": "cc11dc6ad2eccb6cf972",
