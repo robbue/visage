@@ -60,7 +60,7 @@ class Tracker extends React.Component {
 		// license
 		this.visageModule.initializeLicenseManager(this.state.licenseName);
 
-		this.m_Tracker = new this.visageModule.VisageTracker('FFT-Ultra.cfg');
+		this.m_Tracker = new this.visageModule.VisageTracker('FFT-High.cfg');
 
 		// Instantiate the face data object
 		this.faceDataArray = new this.visageModule.FaceDataVector();
