@@ -178,10 +178,8 @@ class Tracker extends React.Component {
 			} else {
 				this.eyesClosed = false;
 			}
-
-			// console.log({
-			// 	eyesClosed: this.eyesClosed
-			// });
+		} else {
+			this.eyesClosed = false;
 		}
 
 		this.$status.current.innerHTML = this.eyesClosed.toString();
