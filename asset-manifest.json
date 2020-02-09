@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.js": "/visage/static/js/main.f529f7da.chunk.js",
-    "main.js.map": "/visage/static/js/main.f529f7da.chunk.js.map",
+    "main.js": "/visage/static/js/main.0a1b8727.chunk.js",
+    "main.js.map": "/visage/static/js/main.0a1b8727.chunk.js.map",
     "runtime-main.js": "/visage/static/js/runtime-main.3e6282ca.js",
     "runtime-main.js.map": "/visage/static/js/runtime-main.3e6282ca.js.map",
     "static/css/2.f5298653.chunk.css": "/visage/static/css/2.f5298653.chunk.css",
     "static/js/2.b9b97ac8.chunk.js": "/visage/static/js/2.b9b97ac8.chunk.js",
     "static/js/2.b9b97ac8.chunk.js.map": "/visage/static/js/2.b9b97ac8.chunk.js.map",
     "index.html": "/visage/index.html",
-    "precache-manifest.898f84e397b431b38c960405a99e96c1.js": "/visage/precache-manifest.898f84e397b431b38c960405a99e96c1.js",
+    "precache-manifest.c7238bc0d98c535d2af9805a646f7f8b.js": "/visage/precache-manifest.c7238bc0d98c535d2af9805a646f7f8b.js",
     "service-worker.js": "/visage/service-worker.js",
     "static/css/2.f5298653.chunk.css.map": "/visage/static/css/2.f5298653.chunk.css.map",
     "static/js/2.b9b97ac8.chunk.js.LICENSE": "/visage/static/js/2.b9b97ac8.chunk.js.LICENSE",
@@ -18,6 +18,6 @@
     "static/js/runtime-main.3e6282ca.js",
     "static/css/2.f5298653.chunk.css",
     "static/js/2.b9b97ac8.chunk.js",
-    "static/js/main.f529f7da.chunk.js"
+    "static/js/main.0a1b8727.chunk.js"
   ]
 }
