@@ -58,7 +58,7 @@ export default class Intro extends PureComponent {
 			onComplete: this.props.onComplete
 		});
 
-		this.introTimeline.timeScale(20);
+		// this.introTimeline.timeScale(20);
 
 		for (let i = 0; i < $elements.length; i++) {
 			const $element = $elements[i];

@@ -10,7 +10,7 @@ module.exports = {
 
 	ARTIST_NAME: 'Artist',
 	SONG_TITLE: 'Song Title',
-	AUDIO_FILE: '/firestone.mp3',
+	AUDIO_FILE: 'firestone.mp3',
 
 	FACEBOOK_URL: '//www.facebook.com/closeyoureyes/',
 	INSTAGRAM_URL: '//www.instagram.com/closeyoureyes/',
