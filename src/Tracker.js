@@ -1,38 +1,120 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
+import { gsap } from 'gsap';
+import { SplitText } from 'gsap/SplitText';
+import { rem, em } from 'polished';
+
+import P from 'components/P';
+import Heading from 'components/Heading';
+import Loading from 'components/Loading';
+import { ReactComponent as Webcam } from 'assets/svg/webcam.svg';
+
+import Intro from './Intro';
+import Music from './Music';
+import { colors, fontWeights, fontFaces, fontSizes } from 'styles/index';
+
+gsap.registerPlugin(SplitText);
 
 const Container = styled.div`
-	text-align: center;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
 `;
-const Button = styled.button``;
+
+const Content = styled.div`
+	position: absolute;
+	z-index: 2;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+`;
+
+const CameraAccess = styled.div`
+	text-align: center;
+	display: none;
+`;
+
+const Button = styled.button`
+	display: inline-flex;
+	align-items: center;
+	font-size: ${rem('13px')};
+	font-weight: ${fontWeights.medium};
+	text-transform: uppercase;
+
+	padding: ${rem('12px')} ${rem('15px')};
+	margin-top: ${em('15px')};
+	cursor: pointer;
+
+	border: 1px solid ${colors.light};
+`;
+
+const Text = styled.p`
+	font-family: ${fontFaces.header};
+	font-size: ${rem(fontSizes.large)};
+	color: ${colors.text};
+	line-height: 1.8;
+
+	padding: 0 ${rem('25px')};
+	margin: 0;
+	display: none;
+`;
+
+const WebcamIcon = styled(Webcam)`
+	width: ${em('23px')};
+	height: ${em('23px')};
+	margin-right: ${em('15px')};
+
+	path, circle {
+		fill: ${colors.grey};
+	}
+`;
+
 const Canvas = styled.canvas``;
 const Status = styled.p``;
 
-class Tracker extends React.Component {
+class Tracker extends PureComponent {
 	constructor (props) {
 		super(props);
 
 		this.state = {
 			sdkLoaded: false,
+			musicLoaded: false,
 			width: 320,
 			height: 240,
-			threshold: 15,
+			threshold: 25,
 			licenseName: '606-555-833-692-564-758-653-442-720-253-644.vlc',
 			licenseURL: 'lib/606-555-833-692-564-758-653-442-720-253-644.vlc'
 		};
 
 		this.$canvas = React.createRef();
 		this.$status = React.createRef();
+		this.$loader = React.createRef();
+		this.$ready = React.createRef();
+		this.$closeYourEyes = React.createRef();
 
 		this._loaded = this._loaded.bind(this);
 		this._initStream = this._initStream.bind(this);
 		this._canPlayStream = this._canPlayStream.bind(this);
 		this._tick = this._tick.bind(this);
+		this._introCompleted = this._introCompleted.bind(this);
 
 		window.callbackDownload = this._loaded;
 	}
 
 	componentDidMount () {
+		this.music = new Music();
+
+		this.music._load(() => {
+			console.log('this.music', this.music);
+			this.setState({ musicLoaded: true });
+		});
+
 		var locateFile = function (dataFileName) {
 			var relativePath = 'lib/' + dataFileName;
 			return relativePath;
@@ -45,15 +127,41 @@ class Tracker extends React.Component {
 
 		var preloadFiles = () => {
 			// the most powerful devices such as newer computers, or mobile devices such as iPhone X/Samsung Galaxy S9.
-			this.visageModule.FS_createPreloadedFile('/', 'FFT-Ultra.cfg', 'lib/Facial Features Tracker - Ultra.cfg', true, false);
+			// this.visageModule.FS_createPreloadedFile('/', 'FFT-Ultra.cfg', 'lib/Facial Features Tracker - Ultra.cfg', true, false);
 			// most computers and mobile devices such as iPhone 6/Samsung Galaxy S5 or better
 			this.visageModule.FS_createPreloadedFile('/', 'FFT-High.cfg', 'lib/Facial Features Tracker - High.cfg', true, false);
 			// low performance mobile devices such as iPhone4S. Tracks head pose, mouth, eyebrows and eye motion.
-			this.visageModule.FS_createPreloadedFile('/', 'FFT-Low.cfg', 'lib/Facial Features Tracker - Low.cfg', true, false);
+			// this.visageModule.FS_createPreloadedFile('/', 'FFT-Low.cfg', 'lib/Facial Features Tracker - Low.cfg', true, false);
 			this.visageModule.FS_createPreloadedFile('/', this.state.licenseName, this.state.licenseURL, true, false, function () {}, function () { console.error('Loading License Failed!'); });
 		};
 
 		this.visageModule.preRun.push(preloadFiles);
+	}
+
+	_introCompleted () {
+		gsap.fromTo(this.$ready.current, 1, {
+			display: 'block',
+			opacity: 0,
+			y: -20
+		}, {
+			opacity: 1,
+			y: 0,
+			onComplete: () => {
+				// this.setState({ sdkLoaded: true });
+			}
+		});
+	}
+
+	_readyToCloseEyes () {
+		const $el = this.$closeYourEyes.current;
+		const splitText = new SplitText($el, { type: 'words', wordsClass: 'word word++' });
+		// const wordsCount = splitText.words.length;
+
+		this.closeEyesTimeline = gsap.timeline()
+		.set($el, { display: 'block' })
+		.from(splitText.words, { duration: 2, opacity: 0, y: 3, ease: 'power2', stagger: 0.1 }, 'words');
+		// .to(splitText.words, { duration: 0.2, opacity: 0, ease: 'power2', stagger: 0.1 }) // , 'words+=2'
+		// .set($el, { display: 'none' });
 	}
 
 	_loaded () {
@@ -87,23 +195,32 @@ class Tracker extends React.Component {
 	}
 
 	async _initStream () {
-		let stream = null;
-		this.$video = document.createElement('video');
+		this.music._play();
 
-		try {
-			stream = await navigator.mediaDevices.getUserMedia({
-				video: true,
-				audio: false
-			});
+		gsap.to(this.$ready.current, 0.5, {
+			opacity: 0,
+			y: 20,
+			onComplete: async () => {
+				gsap.set(this.$ready.current, { display: 'none' });
 
-			this.$video.addEventListener('canplay', this._canPlayStream);
-			this.$video.setAttribute('muted', true);
-			this.$video.setAttribute('playsinline', true);
-			this.$video.srcObject = stream;
-			this.$video.load();
-		} catch (error) {
-			this._errorStream(error);
-		}
+				this.$video = document.createElement('video');
+
+				try {
+					const stream = await navigator.mediaDevices.getUserMedia({
+						video: true,
+						audio: false
+					});
+
+					this.$video.addEventListener('canplay', this._canPlayStream);
+					this.$video.setAttribute('muted', true);
+					this.$video.setAttribute('playsinline', true);
+					this.$video.srcObject = stream;
+					this.$video.load();
+				} catch (error) {
+					this._errorStream(error);
+				}
+			}
+		});
 	}
 
 	_errorStream (error) {
@@ -124,8 +241,8 @@ class Tracker extends React.Component {
 		this.mWidth = this.state.width;
 		this.mHeight = this.state.height;
 
-		// setTimeout(this._tick, 1000);
 		this._tick();
+		this._readyToCloseEyes();
 	}
 
 	_tick () {
@@ -170,37 +287,63 @@ class Tracker extends React.Component {
 			// Index 0 represents closure of left eye. Index 1 represents closure of right eye. Value of 1 represents open eye. Value of 0 represents closed eye.
 
 			if (closedEyes[0] === 0 && closedEyes[1] === 0) {
-				this.eyesClosedCounter++;
-
 				if (this.eyesClosedCounter > this.state.threshold) {
 					this.eyesClosed = true;
+				} else {
+					this.eyesClosedCounter++;
 				}
 			} else {
+				this.eyesClosedCounter = 0;
 				this.eyesClosed = false;
 			}
 		} else {
+			this.eyesClosedCounter = 0;
 			this.eyesClosed = false;
 		}
 
-		this.$status.current.innerHTML = this.eyesClosed.toString();
+		if (this.eyesClosed) {
+			// if (!this.closedForTheFirstTime) this.closeEyesTimeline.reverse();
+			if (!this.closedForTheFirstTime) gsap.to(this.$closeYourEyes.current, 0.5, { opacity: 0 });
+			this.closedForTheFirstTime = true;
+			this.music._fadeIn();
+		} else {
+			this.music._fadeOut();
+		}
 
-		/*
-		NEXT:
-			- install howler and gsap
-			fade in sound and DOM
-		*/
+		// this.$status.current.innerHTML = this.eyesClosed.toString();
 	}
 
 	render () {
 		return (
 			<Container>
-				<Status ref={this.$status} />
+				<Content>
+					{!this.state.sdkLoaded && <Loading ref={this.$loader}>Loading...</Loading>}
+					<Intro sdkLoaded={this.state.sdkLoaded} onComplete={this._introCompleted} />
+
+					<CameraAccess ref={this.$ready}>
+						<Heading rank={2} asRank={4}>Are you ready?</Heading>
+						<P>We need access to your webcam to be able to track if you close your eyes.</P>
+						<Button onClick={this._initStream}>
+							<WebcamIcon />Give camera access
+						</Button>
+					</CameraAccess>
+
+					<Text ref={this.$closeYourEyes}><strong>Close your eyes</strong> to listen.</Text>
+				</Content>
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
-				<Container>
-					{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
-				</Container>
 			</Container>
 		);
+
+		// return (
+		// 	<Container>
+		// 		<Intro sdkLoaded={this.state.sdkLoaded} />
+		// 		<Status ref={this.$status} />
+		// 		<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
+		// 		<Container>
+		// 			{this.state.sdkLoaded && <Button onClick={this._initStream}>Start</Button>}
+		// 		</Container>
+		// 	</Container>
+		// );
 	}
 }
 

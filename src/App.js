@@ -1,17 +1,11 @@
 import React from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 // import logo from './logo.svg';
 import { AppContainer } from './styles'; // , AppHeader, AppTitle, AppLogo, AppIntro
 import Tracker from './Tracker';
-
-// Add global styles
-const GlobalStyle = createGlobalStyle`
-	body {
-		margin: 0;
-		padding: 0;
-		font-family: sans-serif;
-	}
-`;
+import { GlobalStyle } from 'styles/global.js';
+import Grid from 'components/Grid';
+import Background from 'components/Background';
 
 export const Button = styled.button``;
 
@@ -21,6 +15,8 @@ function App () {
 			<GlobalStyle />
 			<AppContainer>
 				<Tracker />
+				<Background />
+				<Grid />
 			</AppContainer>
 		</React.Fragment>
 	);
