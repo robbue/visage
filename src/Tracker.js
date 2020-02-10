@@ -74,6 +74,7 @@ const Skip = styled.button`
 const Button = styled.button`
 	display: inline-flex;
 	align-items: center;
+	position: relative;
 	font-size: ${rem('12px')};
 	font-weight: ${fontWeights.medium};
 	text-transform: uppercase;
@@ -81,12 +82,31 @@ const Button = styled.button`
 	padding: ${em('16px')} ${em('18px')};
 	margin-top: ${em('15px')};
 	cursor: pointer;
+	overflow: hidden;
 
 	border: 1px solid ${colors.light};
-	transition: border 250ms ease;
+	transition: border 250ms ease, color 250ms ease;
+
+	&::after {
+		content: '';
+		position: absolute;
+		z-index: -1;
+		top: 100%;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: ${colors.dark};
+		transition: transform 250ms ease;
+	}
 
 	&:hover {
-		border-color: ${lighten(0.1, colors.light)};
+		// border-color: ${lighten(0.1, colors.light)};
+		border-color: ${colors.dark};
+		color: ${colors.white};
+
+		&::after {
+			transform: translateY(-100%);
+		}
 	}
 `;
 
@@ -196,7 +216,10 @@ class Tracker extends PureComponent {
 	}
 
 	_songEnd () {
-		this.setState({ eyesClosedCount: this.eyesClosedCount });
+		this.setState({
+			eyesClosedCount: this.eyesClosedCount,
+			eyesClosedSession: '1 minute and 4 seconds'
+		});
 
 		gsap.to(this.$closeYourEyes.current, 0.5, {
 			opacity: 0,
