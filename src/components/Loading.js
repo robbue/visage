@@ -23,7 +23,7 @@ const Loader = styled(Spinner)`
 const Text = styled(P)`
 	width: 100%;
 	font-size: ${rem('12px')};
-	color: ${colors.text};
+	color: ${colors.medium};
 	margin: 0;
 	padding: 0;
 `;

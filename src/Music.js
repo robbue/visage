@@ -4,9 +4,9 @@ import appConfig from 'app.config';
 
 export default class Music {
 	constructor (props) {
-		this.loaded = false;
+		// this.loaded = false;
 
-		this._load = this._load.bind(this);
+		// this._load = this._load.bind(this);
 		this._loaded = this._loaded.bind(this);
 		this._play = this._play.bind(this);
 		this._pause = this._pause.bind(this);
@@ -24,30 +24,30 @@ export default class Music {
 		this.audioHowl = new Howl({
 			src: [appConfig.AUDIO_FILE],
 			volume: 0,
-			loop: true,
+			loop: false,
 			autoplay: false
 		});
 
-		this.audioHowl.on('load', this._loaded);
+		this.audioHowl.once('load', this._loaded);
 	}
 
-	_load (callback) {
-		this.loadedCallback = callback;
+	// _load (callback) {
+	// 	this.loadedCallback = callback;
 
-		if (this.loaded) {
-			this._loaded();
-		}
-	}
+	// 	if (this.loaded) {
+	// 		this._loaded();
+	// 	}
+	// }
 
 	_loaded () {
-		this.loaded = true;
-		this.audioHowl.off('load', this._loaded);
+		// this.loaded = true;
+		// this.audioHowl.off('load', this._loaded);
 
 		if (Howler.usingWebAudio === true && Howler.ctx) {
 			Howler.ctx.addEventListener('statechange', this._resumeCtx);
 		}
 
-		this.loadedCallback();
+		// this.loadedCallback();
 
 		// this._start();
 	}
@@ -82,7 +82,7 @@ export default class Music {
 		this.audioHowl.off('fade');
 
 		this.audio = this.audioHowl.play(this.audio);
-		this.audioHowl.fade(this.audioHowl._volume, 1.0, 1000); // , this.audio
+		this.audioHowl.fade(this.audioHowl._volume, 1.0, 2000); // , this.audio
 	}
 
 	_fadeOut () {
@@ -97,6 +97,6 @@ export default class Music {
 			this.audioHowl.pause(this.audio).volume(0.0);
 		});
 
-		this.audioHowl.fade(this.audioHowl._volume, 0.0, 1000); // .pause(this.audio).volume(0.0) , this.audio
+		this.audioHowl.fade(this.audioHowl._volume, 0.0, 2000); // .pause(this.audio).volume(0.0) , this.audio
 	}
 }

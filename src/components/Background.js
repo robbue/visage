@@ -1,15 +1,34 @@
 import React, { PureComponent } from 'react';
 import styled from 'styled-components';
-import { Howl, Howler } from 'howler';
+import { Howler } from 'howler';
+import { gsap } from 'gsap';
 import { HALF_PI, rand, fadeInOut, angle, lerp } from 'utils/helpers';
+import Sketch from 'Sketch';
 const { cos, sin } = Math;
 
 const Canvas = styled.canvas`
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+`;
+
+const BackgroundContainer = styled.div`
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
+
+	canvas {
+		position: absolute;
+		z-index: 99;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
 `;
 
 export default class Background extends PureComponent {
@@ -38,8 +57,10 @@ export default class Background extends PureComponent {
 
 		this.$canvasB = React.createRef();
 		this.$status = React.createRef();
+		this.$background = React.createRef();
 
 		// this._loaded = this._loaded.bind(this);
+		this._next = this._next.bind(this);
 		this._draw = this._draw.bind(this);
 		this._play = this._play.bind(this);
 		this._pause = this._pause.bind(this);
@@ -49,15 +70,61 @@ export default class Background extends PureComponent {
 	componentDidMount () {
 		window.addEventListener('mousemove', this._mouseMove, false);
 
-		const nusic = Howler._howls[0];
-		console.log('_howls', Howler._howls, nusic);
-		nusic.on('play', this._play);
-		nusic.on('pause', this._pause);
+		const music = Howler._howls[0];
+		console.log('_howls', Howler._howls, music);
+		music.on('play', this._play);
+		music.on('pause', this._pause);
+		// music.on('volume', this._next);
 
 		this._createCanvas();
 		this._resize();
 		this._initParticles();
 		this._draw();
+
+		// this._webgl();
+	}
+
+	_webgl () {
+		this.sketch = new Sketch({
+			el: this.$background.current,
+			bgCanvas: this.canvas,
+			duration: 1,
+			debug: true,
+			uniforms: {
+				radius: { value: 0.9, type: 'f', min: 0.1, max: 2 },
+				width: { value: 0.35, type: 'f', min: 0.0, max: 1 }
+			},
+			fragment: `
+				uniform float progress;
+				uniform float width;
+				uniform float transition;
+				uniform float radius;
+				uniform sampler2D texture1;
+				uniform sampler2D texture2;
+				uniform vec4 resolution;
+				varying vec2 vUv;
+				varying vec4 vPosition;
+				float parabola( float x, float k ) {
+					return pow( 4. * x * ( 1. - x ), k );
+				}
+				void main()	{
+				vec2 newUV = (vUv - vec2(0.5))*resolution.zw + vec2(0.5);
+				vec2 p = newUV;
+				vec2 start = vec2(0.5,0.5);
+				vec2 aspect = resolution.wz;
+				vec2 uv = newUV;
+				float dt = parabola(progress, 1.);
+				float prog = progress*0.66;
+				float circ = 1. - smoothstep(-width, 0.0, radius * distance(start*aspect, uv*aspect) - prog*(1.+width));
+				float intpl = pow(abs(circ), 1.);
+				vec4 t1 = texture2D( texture1, (uv - 0.5) * (1.0 - intpl) + 0.5 ) ;
+				vec4 t2 = texture2D( texture2, (uv - 0.5) * intpl + 0.5 );
+				gl_FragColor = mix( t1, t2, intpl );
+			}
+			`
+		});
+
+		console.log({ sketch: this.sketch });
 	}
 
 	_createCanvas () {
@@ -198,11 +265,34 @@ export default class Background extends PureComponent {
 	}
 
 	_play () {
+		// this._next();
+
 		// this.hue = 10;
 	}
 
 	_pause () {
+		// this._next();
 		// this.hue = 192;
+	}
+
+	_next () {
+		console.log('_next');
+		// if (this.sketch.isRunning) return;
+		this.sketch.isRunning = true;
+		let len = this.sketch.textures.length;
+		let nextTexture = this.sketch.textures[(this.sketch.current + 1) % len];
+		this.sketch.material.uniforms.texture2.value = nextTexture;
+		let tl = gsap.timeline();
+		tl.to(this.sketch.material.uniforms.progress, this.sketch.duration, {
+			value: 1,
+			ease: 'power2.inOut',
+			onComplete: () => {
+				this.sketch.current = (this.sketch.current + 1) % len;
+				this.sketch.material.uniforms.texture1.value = nextTexture;
+				this.sketch.material.uniforms.progress.value = 0;
+				this.sketch.isRunning = false;
+			}
+		});
 	}
 
 	_resize () {
@@ -224,7 +314,9 @@ export default class Background extends PureComponent {
 
 	render () {
 		return (
-			<Canvas ref={this.$canvasB} width={this.state.width} height={this.state.height} />
+			<BackgroundContainer ref={this.$background}>
+				<Canvas ref={this.$canvasB} width={this.state.width} height={this.state.height} />
+			</BackgroundContainer>
 		);
 	}
 }

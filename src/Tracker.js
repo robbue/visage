@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import styled from 'styled-components';
 import { gsap } from 'gsap';
 import { SplitText } from 'gsap/SplitText';
-import { rem, em } from 'polished';
+import { rem, em, lighten } from 'polished';
 
 import P from 'components/P';
 import Heading from 'components/Heading';
@@ -12,6 +12,7 @@ import { ReactComponent as Webcam } from 'assets/svg/webcam.svg';
 import Intro from './Intro';
 import Music from './Music';
 import { colors, fontWeights, fontFaces, fontSizes } from 'styles/index';
+import appConfig from 'app.config';
 
 gsap.registerPlugin(SplitText);
 
@@ -21,6 +22,18 @@ const Container = styled.div`
 	left: 0;
 	width: 100%;
 	height: 100%;
+`;
+
+const Preloader = styled.div`
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	background: ${colors.light};
+	visibility: hidden;
 `;
 
 const Content = styled.div`
@@ -40,18 +53,41 @@ const CameraAccess = styled.div`
 	display: none;
 `;
 
+const Completed = styled.div`
+	text-align: center;
+	display: none;
+`;
+
+const Skip = styled.button`
+	position: fixed;
+	z-index: 99;
+	bottom: 0;
+	right: 0;
+	width: 50px;
+	height: 50px;
+
+	&:hover {
+		background: grey;
+	}
+`;
+
 const Button = styled.button`
 	display: inline-flex;
 	align-items: center;
-	font-size: ${rem('13px')};
+	font-size: ${rem('12px')};
 	font-weight: ${fontWeights.medium};
 	text-transform: uppercase;
 
-	padding: ${rem('12px')} ${rem('15px')};
+	padding: ${em('16px')} ${em('18px')};
 	margin-top: ${em('15px')};
 	cursor: pointer;
 
 	border: 1px solid ${colors.light};
+	transition: border 250ms ease;
+
+	&:hover {
+		border-color: ${lighten(0.1, colors.light)};
+	}
 `;
 
 const Text = styled.p`
@@ -66,8 +102,8 @@ const Text = styled.p`
 `;
 
 const WebcamIcon = styled(Webcam)`
-	width: ${em('23px')};
-	height: ${em('23px')};
+	width: ${em('22px')};
+	height: ${em('22px')};
 	margin-right: ${em('15px')};
 
 	path, circle {
@@ -89,16 +125,21 @@ class Tracker extends PureComponent {
 			height: 240,
 			threshold: 25,
 			licenseName: '606-555-833-692-564-758-653-442-720-253-644.vlc',
-			licenseURL: 'lib/606-555-833-692-564-758-653-442-720-253-644.vlc'
+			licenseURL: 'lib/606-555-833-692-564-758-653-442-720-253-644.vlc',
+			eyesClosedSession: '',
+			eyesClosedCount: 0
 		};
 
+		this.$preloader = React.createRef();
 		this.$canvas = React.createRef();
 		this.$status = React.createRef();
 		this.$loader = React.createRef();
 		this.$ready = React.createRef();
 		this.$closeYourEyes = React.createRef();
+		this.$completed = React.createRef();
 
 		this._loaded = this._loaded.bind(this);
+		this._songEnd = this._songEnd.bind(this);
 		this._initStream = this._initStream.bind(this);
 		this._canPlayStream = this._canPlayStream.bind(this);
 		this._tick = this._tick.bind(this);
@@ -109,11 +150,13 @@ class Tracker extends PureComponent {
 
 	componentDidMount () {
 		this.music = new Music();
+		const { audioHowl } = this.music;
 
-		this.music._load(() => {
-			console.log('this.music', this.music);
+		audioHowl.once('load', () => {
 			this.setState({ musicLoaded: true });
 		});
+
+		audioHowl.on('end', this._songEnd);
 
 		var locateFile = function (dataFileName) {
 			var relativePath = 'lib/' + dataFileName;
@@ -152,12 +195,39 @@ class Tracker extends PureComponent {
 		});
 	}
 
+	_songEnd () {
+		this.setState({ eyesClosedCount: this.eyesClosedCount });
+
+		gsap.to(this.$closeYourEyes.current, 0.5, {
+			opacity: 0,
+			display: 'none',
+			onComplete: () => {
+				gsap.fromTo(this.$completed.current, 1, {
+					display: 'block',
+					opacity: 0,
+					y: -20
+				}, {
+					delay: 1,
+					opacity: 1,
+					y: 0,
+					onComplete: () => {
+						// this.setState({ sdkLoaded: true });
+					}
+				});
+			}
+		});
+	}
+
 	_readyToCloseEyes () {
 		const $el = this.$closeYourEyes.current;
 		const splitText = new SplitText($el, { type: 'words', wordsClass: 'word word++' });
 		// const wordsCount = splitText.words.length;
 
-		this.closeEyesTimeline = gsap.timeline()
+		this.closeEyesTimeline = gsap.timeline({
+			onComplete: () => {
+				this.block = false;
+			}
+		})
 		.set($el, { display: 'block' })
 		.from(splitText.words, { duration: 2, opacity: 0, y: 3, ease: 'power2', stagger: 0.1 }, 'words');
 		// .to(splitText.words, { duration: 0.2, opacity: 0, ease: 'power2', stagger: 0.1 }) // , 'words+=2'
@@ -191,11 +261,33 @@ class Tracker extends PureComponent {
 		this.eyesClosedCounter = 0;
 
 		// Show Start button
-		this.setState({ sdkLoaded: true });
+		// this.setState({ sdkLoaded: true });
+
+		gsap.fromTo(this.$preloader.current, 1.2, {
+			visibility: 'visible',
+			y: '100%'
+		}, {
+			delay: 1,
+			y: '0%',
+			ease: 'expo.inOut',
+			onComplete: () => {
+				gsap.set(this.$loader.current, { display: 'none' });
+
+				gsap.to(this.$preloader.current, 1.2, {
+					y: '-100%',
+					ease: 'expo.inOut',
+					onComplete: () => {
+						this.setState({ sdkLoaded: true });
+					}
+				});
+			}
+		});
 	}
 
 	async _initStream () {
-		this.music._play();
+		// this.music._play();
+		this.music._fadeIn();
+		this.block = true;
 
 		gsap.to(this.$ready.current, 0.5, {
 			opacity: 0,
@@ -230,6 +322,7 @@ class Tracker extends PureComponent {
 	_canPlayStream (stream) {
 		this.startTracking = true;
 		this.draw = true;
+		this.eyesClosedCount = 0;
 
 		this.$video.removeEventListener('canplay', this._canPlayStream);
 
@@ -289,6 +382,7 @@ class Tracker extends PureComponent {
 			if (closedEyes[0] === 0 && closedEyes[1] === 0) {
 				if (this.eyesClosedCounter > this.state.threshold) {
 					this.eyesClosed = true;
+					this.eyesClosedCount++;
 				} else {
 					this.eyesClosedCounter++;
 				}
@@ -301,13 +395,17 @@ class Tracker extends PureComponent {
 			this.eyesClosed = false;
 		}
 
-		if (this.eyesClosed) {
-			// if (!this.closedForTheFirstTime) this.closeEyesTimeline.reverse();
-			if (!this.closedForTheFirstTime) gsap.to(this.$closeYourEyes.current, 0.5, { opacity: 0 });
-			this.closedForTheFirstTime = true;
-			this.music._fadeIn();
-		} else {
-			this.music._fadeOut();
+		if (!this.block) {
+			if (this.eyesClosed) {
+				// if (!this.closedForTheFirstTime) this.closeEyesTimeline.reverse();
+				// if (!this.closedForTheFirstTime) gsap.to(this.$closeYourEyes.current, 0.5, { opacity: 0 });
+				this.closedForTheFirstTime = true;
+				this.music._fadeIn();
+				this.closeEyesTimeline.reverse();
+			} else {
+				this.music._fadeOut();
+				if (this.closeEyesTimeline && this.closedForTheFirstTime) this.closeEyesTimeline.play();
+			}
 		}
 
 		// this.$status.current.innerHTML = this.eyesClosed.toString();
@@ -316,8 +414,9 @@ class Tracker extends PureComponent {
 	render () {
 		return (
 			<Container>
+				<Preloader ref={this.$preloader} />
 				<Content>
-					{!this.state.sdkLoaded && <Loading ref={this.$loader}>Loading...</Loading>}
+					{!this.state.sdkLoaded && <Loading ref={this.$loader}>Loading experience...</Loading>}
 					<Intro sdkLoaded={this.state.sdkLoaded} onComplete={this._introCompleted} />
 
 					<CameraAccess ref={this.$ready}>
@@ -328,9 +427,15 @@ class Tracker extends PureComponent {
 						</Button>
 					</CameraAccess>
 
+					<Completed ref={this.$completed}>
+						<Heading rank={2} asRank={4}>We hope you enjoyed {appConfig.SONG_TITLE} by {appConfig.ARTIST_NAME}.</Heading>
+						<P>You opened your eyes {this.state.eyesClosedCount} times and your longest consecutive session was {this.state.eyesClosedSession} </P>
+					</Completed>
+
 					<Text ref={this.$closeYourEyes}><strong>Close your eyes</strong> to listen.</Text>
 				</Content>
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
+				<Skip onClick={this._songEnd} />
 			</Container>
 		);
 
