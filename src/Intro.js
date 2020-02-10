@@ -68,7 +68,7 @@ export default class Intro extends PureComponent {
 
 			const tl = gsap.timeline()
 			.set($element, { display: 'block' })
-			.from(splitText.words, { duration: 2, opacity: 0, y: 3, ease: 'power2', stagger: 0.1 }, 'words')
+			.from(splitText.words, { duration: 2.5, opacity: 0, y: 3, ease: 'power2', stagger: 0.1 }, 'words')
 			.to(splitText.words, { duration: 0.2, opacity: 0, ease: 'power2', stagger: 0.1 }) // , 'words+=2'
 			.set($element, { display: 'none' });
 
