@@ -8,9 +8,9 @@ module.exports = {
 	LOCALE: 'nb',
 	GA_TRACKING_ID: '',
 
-	ARTIST_NAME: 'Kygo',
-	SONG_TITLE: 'Firestone',
-	AUDIO_FILE: 'firestone.mp3',
+	ARTIST_NAME: 'Karpe',
+	SONG_TITLE: 'Project X',
+	AUDIO_FILE: 'assets/firestone.mp3',
 
 	FACEBOOK_URL: '//www.facebook.com/closeyoureyes/',
 	INSTAGRAM_URL: '//www.instagram.com/closeyoureyes/',
@@ -19,10 +19,7 @@ module.exports = {
 	paths: {
 		index: {
 			name: 'Close your eyes',
-			url: '/',
-			employees: true,
-			menu: true,
-			estatePicker: true
+			url: '/'
 		}
 	}
 };

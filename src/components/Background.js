@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Howler } from 'howler';
 import { gsap } from 'gsap';
 import { HALF_PI, rand, fadeInOut, angle, lerp } from 'utils/helpers';
-import Sketch from 'Sketch';
+import Sketch from 'containers/Tracker/Sketch';
 const { cos, sin } = Math;
 
 const Canvas = styled.canvas`
