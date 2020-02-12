@@ -60,6 +60,19 @@ export const Skip = styled.button`
 	}
 `;
 
+export const Skip2 = styled.button`
+	position: fixed;
+	z-index: 99;
+	bottom: 50px;
+	right: 0;
+	width: 50px;
+	height: 50px;
+
+	&:hover {
+		background: grey;
+	}
+`;
+
 export const WebcamIcon = styled(Webcam)`
 	width: ${em('22px')};
 	height: ${em('22px')};

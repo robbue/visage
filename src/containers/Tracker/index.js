@@ -8,7 +8,7 @@ import Loading from 'components/Loading';
 
 import Intro from './Intro';
 import Music from './Music';
-import { Container, Preloader, Content, CameraAccess, Completed, Skip, Button, Text, WebcamIcon, Canvas, GeoLocationAccess, Location, PinIcon } from './styles';
+import { Container, Preloader, Content, CameraAccess, Completed, Skip, Skip2, Button, Text, WebcamIcon, Canvas, GeoLocationAccess, Location, PinIcon } from './styles';
 import appConfig from 'app.config';
 import { distance } from 'utils/helpers';
 
@@ -63,6 +63,7 @@ class Tracker extends PureComponent {
 		this._geolocationError = this._geolocationError.bind(this);
 		this._watchGeoSuccess = this._watchGeoSuccess.bind(this);
 		this._watchGeoError = this._watchGeoError.bind(this);
+		this._geoCompleted = this._geoCompleted.bind(this);
 
 		window.callbackDownload = this._loaded;
 	}
@@ -155,7 +156,8 @@ class Tracker extends PureComponent {
 	_checkLocation (currentLatitude, currentLongitude) {
 		const { latitude, longitude } = this.state.location;
 		let distanceKm = distance(currentLatitude, currentLongitude, latitude, longitude); // returns km
-		let distanceOutput = distanceKm < 10 ? `${Math.round(distanceKm * 1000)} meter` : `${Math.round(distanceKm)} kilometer`;
+		// let distanceOutput = distanceKm < 10 ? `${Math.round(distanceKm * 1000)} meter` : `${Math.round(distanceKm)} kilometer`;
+		let distanceOutput = `${Math.round(distanceKm * 1000).toLocaleString()} meter`;
 
 		this.setState({ distance: distanceOutput });
 
@@ -469,6 +471,7 @@ class Tracker extends PureComponent {
 				</Content>
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
 				<Skip onClick={this._songEnd} />
+				<Skip2 onClick={this._geoCompleted} />
 			</Container>
 		);
 
