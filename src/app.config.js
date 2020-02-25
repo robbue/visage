@@ -10,7 +10,7 @@ module.exports = {
 
 	ARTIST_NAME: 'Karpe',
 	SONG_TITLE: 'Project X',
-	AUDIO_FILE: 'assets/firestone.mp3',
+	AUDIO_FILE: 'firestone.mp3',
 
 	FACEBOOK_URL: '//www.facebook.com/closeyoureyes/',
 	INSTAGRAM_URL: '//www.instagram.com/closeyoureyes/',
