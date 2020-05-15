@@ -8,8 +8,8 @@ module.exports = {
 	LOCALE: 'nb',
 	GA_TRACKING_ID: '',
 
-	ARTIST_NAME: 'Karpe',
-	SONG_TITLE: 'Project X',
+	ARTIST_NAME: 'Kygo',
+	SONG_TITLE: 'Firestone',
 	AUDIO_FILE: 'firestone.mp3',
 
 	FACEBOOK_URL: '//www.facebook.com/closeyoureyes/',

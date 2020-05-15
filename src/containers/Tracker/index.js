@@ -18,6 +18,10 @@ class Tracker extends PureComponent {
 	constructor (props) {
 		super(props);
 
+		const urlParams = new URLSearchParams(window.location.search); // eslint-disable-line no-undef
+		const gpsParam = urlParams.has('gps') ? urlParams.get('gps') : '60.3931083,5.3229279'; // Torgallmenningen i Bergen: 60.3931083,5.3229279
+		const gps = gpsParam.split(',');
+
 		this.state = {
 			sdkLoaded: false,
 			musicLoaded: false,
@@ -30,9 +34,18 @@ class Tracker extends PureComponent {
 			eyesClosedCount: 0,
 			loadingGeo: false,
 			distance: '0 km',
-			location: { // Festiviteten i Skien: 59.2094395,9.607377
-				latitude: 59.2094395,
-				longitude: 9.607377
+			location: {
+				// Festiviteten i Skien: 59.2094395,9.607377
+				// name: 'Festiviteten i Skien',
+				// latitude: 59.2094395,
+				// longitude: 9.607377
+				name: urlParams.has('lokasjon') ? urlParams.get('lokasjon') : 'Torgallmenningen i Bergen',
+				latitude: gps[0],
+				longitude: gps[1],
+				distanceThreshold: urlParams.has('distanse') ? urlParams.get('distanse') : 1
+			},
+			distanceThreshold: {
+				km: urlParams.has('distanse') ? urlParams.get('distanse') : 1
 			},
 			geoOptions: {
 				maximumAge: 0,
@@ -163,7 +176,7 @@ class Tracker extends PureComponent {
 
 		console.log('_checkLocation', distanceOutput, distanceKm);
 
-		if (distanceKm < 1) {
+		if (distanceKm < this.state.distanceThreshold) {
 			this._geoCompleted();
 		} else {
 			if (!this.watchPosition) {
@@ -304,9 +317,13 @@ class Tracker extends PureComponent {
 	}
 
 	async _initStream () {
-		// this.music._play();
-		this.music._fadeIn();
+		this.music._play();
+		// this.music._fadeIn();
 		this.block = true;
+
+		setTimeout(() => {
+			this.music._pause();
+		}, 0);
 
 		gsap.to(this.$ready.current, 0.5, {
 			opacity: 0,
@@ -347,6 +364,7 @@ class Tracker extends PureComponent {
 		this.$video.removeEventListener('canplay', this._canPlayStream);
 
 		this.$video.play();
+		this.music._fadeIn();
 
 		this.$canvas.current.width = this.state.width;
 		this.$canvas.current.height = this.state.height;
@@ -437,12 +455,12 @@ class Tracker extends PureComponent {
 				<Preloader ref={this.$preloader} />
 				<Content>
 					{!this.state.sdkLoaded && <Loading ref={this.$loader}>Laster en ny type opplevelse...</Loading>}
-					<Intro sdkLoaded={this.state.sdkLoaded} onComplete={this._introCompleted} />
+					<Intro sdkLoaded={this.state.sdkLoaded} onComplete={this._introCompleted} locationName={this.state.location.name} />
 
 					<GeoLocationAccess ref={this.$locationAccess}>
 						{this.state.loadingGeo ? <Loading /> : <Fragment>
-							<Heading rank={2} asRank={4}>Besøk Festiviteten i Skien</Heading>
-							<P>For å lytte så må du besøke vårt nye konserthus i Skien.</P>
+							<Heading rank={2} asRank={4}>Besøk {this.state.location.name}</Heading>
+							<P>For å lytte så må du være på lokasjonen.</P>
 							<Button onClick={this._initGeo}>
 								<PinIcon />Hvor er du nå?
 							</Button>
@@ -451,7 +469,7 @@ class Tracker extends PureComponent {
 
 					<Location ref={this.$location}>
 						<Heading rank={2} asRank={4}>Beklager</Heading>
-						<P>Du er {this.state.distance} unna. Besøk Festiviteten i Skien.</P>
+						<P>Du er {this.state.distance} unna. Besøk {this.state.location.name}.</P>
 					</Location>
 
 					<CameraAccess ref={this.$ready}>
@@ -463,15 +481,15 @@ class Tracker extends PureComponent {
 					</CameraAccess>
 
 					<Completed ref={this.$completed}>
-						<Heading rank={2} asRank={4}>We hope you enjoyed {appConfig.SONG_TITLE} by {appConfig.ARTIST_NAME}.</Heading>
-						<P>You opened your eyes {this.state.eyesClosedCount} times and your longest consecutive session was {this.state.eyesClosedSession} </P>
+						<Heading rank={2} asRank={4}>Vi håper du har fått en ny type opplevelse av {appConfig.SONG_TITLE} fra {appConfig.ARTIST_NAME}.</Heading>
+						<P>Du åpnet øynene {this.state.eyesClosedCount} ganger og din lengste sammenhengende økt var {this.state.eyesClosedSession} </P>
 					</Completed>
 
-					<Text ref={this.$closeYourEyes}><strong>Close your eyes</strong> to listen.</Text>
+					<Text ref={this.$closeYourEyes}><strong>Lukk øynene</strong> for å lytte.</Text>
 				</Content>
 				<Canvas ref={this.$canvas} width={this.state.width} height={this.state.height} />
-				<Skip onClick={this._songEnd} />
-				<Skip2 onClick={this._geoCompleted} />
+				<Skip onClick={this._geoCompleted} />
+				<Skip2 onClick={this._songEnd} />
 			</Container>
 		);
 

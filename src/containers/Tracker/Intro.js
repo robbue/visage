@@ -38,12 +38,13 @@ export default class Intro extends PureComponent {
 		this.$text3 = React.createRef();
 		this.$text4 = React.createRef();
 		this.$text5 = React.createRef();
+		this.$text6 = React.createRef();
 
 		// this._loaded = this._loaded.bind(this);
 	}
 
 	componentDidMount () {
-		this._tl([this.$text1.current, this.$text2.current, this.$text3.current, this.$text4.current, this.$text5.current]);
+		this._tl([this.$text1.current, this.$text2.current, this.$text3.current, this.$text4.current, this.$text5.current, this.$text6.current]);
 	}
 
 	componentDidUpdate ({ sdkLoaded }) {
@@ -93,10 +94,10 @@ export default class Intro extends PureComponent {
 			<Container>
 				<Text ref={this.$text1}>I en verden hvor <strong>kampen om vår oppmerksomhet</strong> bare blir større.</Text>
 				<Text ref={this.$text2}>Så tar vi oss ikke tid til <strong>å faktisk lytte til musikk</strong>.</Text>
-				<Text ref={this.$text3}><strong>{appConfig.ARTIST_NAME}</strong> vil at du skal få en fullverdig opplevelse av det nye albumet <strong>{appConfig.SONG_TITLE}</strong>.</Text>
-				<Text ref={this.$text4}>Men det er <strong>en hake</strong>...</Text>
-				<Text ref={this.$text5}>Du må <strong>lukke øyene</strong> for å lytte til musikken.</Text>
-				{/* <Text ref={this.$text5}>Du må <strong>være på Festiviteten og lukke øyene</strong> for å lytte til musikken.</Text> */}
+				<Text ref={this.$text3}><strong>{appConfig.ARTIST_NAME}</strong> vil at du skal få en fullverdig opplevelse av den nye sangen <strong>{appConfig.SONG_TITLE}</strong>.</Text>
+				<Text ref={this.$text4}>Men det er <strong>to haker</strong>...</Text>
+				<Text ref={this.$text5}>Du må være på <strong>{this.props.locationName}</strong> og...</Text>
+				<Text ref={this.$text6}>du må <strong>lukke øyene</strong> for å kunne lytte til sangen.</Text>
 			</Container>
 		);
 	}

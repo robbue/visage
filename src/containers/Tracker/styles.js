@@ -56,7 +56,7 @@ export const Skip = styled.button`
 	height: 50px;
 
 	&:hover {
-		background: grey;
+		background: red;
 	}
 `;
 
@@ -69,7 +69,7 @@ export const Skip2 = styled.button`
 	height: 50px;
 
 	&:hover {
-		background: grey;
+		background: blue;
 	}
 `;
 
