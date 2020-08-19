@@ -28,8 +28,8 @@ class Tracker extends PureComponent {
 			width: 320,
 			height: 240,
 			threshold: 25,
-			licenseName: '471-250-379-720-413-251-198-211-578-198-112.vlc',
-			licenseURL: 'lib/471-250-379-720-413-251-198-211-578-198-112.vlc',
+			licenseName: '599-858-224-551-803-036-046-371-410-146-073.vlc',
+			licenseURL: 'lib/599-858-224-551-803-036-046-371-410-146-073.vlc',
 			eyesClosedSession: '',
 			eyesClosedCount: 0,
 			loadingGeo: false,
@@ -43,9 +43,6 @@ class Tracker extends PureComponent {
 				latitude: gps[0],
 				longitude: gps[1],
 				distanceThreshold: urlParams.has('distanse') ? urlParams.get('distanse') : 1
-			},
-			distanceThreshold: {
-				km: urlParams.has('distanse') ? urlParams.get('distanse') : 1
 			},
 			geoOptions: {
 				maximumAge: 0,
@@ -174,9 +171,9 @@ class Tracker extends PureComponent {
 
 		this.setState({ distance: distanceOutput });
 
-		console.log('_checkLocation', distanceOutput, distanceKm);
+		console.log('_checkLocation', distanceOutput, distanceKm, this.state.location.distanceThreshold);
 
-		if (distanceKm < this.state.distanceThreshold) {
+		if (distanceKm < this.state.location.distanceThreshold) {
 			this._geoCompleted();
 		} else {
 			if (!this.watchPosition) {
